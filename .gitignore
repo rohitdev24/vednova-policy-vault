@@ -6,3 +6,4 @@ Thumbs.db
 # Logs and scratch tests
 *.log
 scratch/
+.firebase/
