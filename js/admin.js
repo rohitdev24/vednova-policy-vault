@@ -267,11 +267,11 @@ window.filterClientsTable = function() {
 };
 
 window.openClientVault = function(caseId) {
-  window.open(`index.html?caseId=${encodeURIComponent(caseId)}`, '_blank');
+  window.open(`vault.html?caseId=${encodeURIComponent(caseId)}`, '_blank');
 };
 
 window.copyClientVaultLink = function(caseId) {
-  const url = `${window.location.origin}${window.location.pathname.replace('mfd-admin.html', '')}index.html?caseId=${encodeURIComponent(caseId)}`;
+  const url = `${window.location.origin}${window.location.pathname.replace('mfd-admin.html', '')}vault.html?caseId=${encodeURIComponent(caseId)}`;
   navigator.clipboard.writeText(url).then(() => {
     alert(`Client Vault link copied to clipboard!\n\n${url}`);
   }).catch(() => {
@@ -1258,5 +1258,5 @@ window.handleCreateClient = function(e) {
   renderTeamGrid();
 
   // Open the newly created client's vault immediately in a new tab
-  window.open(`index.html?caseId=${encodeURIComponent(caseId)}`, '_blank');
+  window.open(`vault.html?caseId=${encodeURIComponent(caseId)}`, '_blank');
 };

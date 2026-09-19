@@ -10,6 +10,18 @@
       "server.js"
     ],
     "cleanUrls": true,
-    "trailingSlash": false
+    "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/mfd-landing",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/mfd-landing.html",
+        "destination": "/",
+        "type": 301
+      }
+    ]
   }
 }
