@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vednova Policy Vault — Fiduciary Insurance Review</title>
+  <meta name="description" content="AI-Powered Evidence-Led Insurance Policy Review & Family Vault. Operating under Vednova SOP v2.">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 900: '#070f1a', 950: '#04080f' },
+            navy: { 700: '#152438', 800: '#0d1827', 900: '#08111d', 950: '#050c16' },
+            panel: { 800: '#0f1f33', 900: '#0a1524' },
+            gold: {
+              300: '#f7dfa8',
+              400: '#eed08f',
+              500: '#e1bc70',
+              600: '#c59d4f',
+              700: '#9d7832'
+            }
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #04080f;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(ellipse at 15% 10%, rgba(21, 36, 56, 0.45), transparent 45%),
+        radial-gradient(ellipse at 85% 85%, rgba(225, 188, 112, 0.04), transparent 40%);
+      background-attachment: fixed;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #050c16;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-slate-200 selection:bg-gold-500 selection:text-ink-950">
+
+  <!-- TOP APP HEADER (PURE VEDNOVA BRANDING) -->
+  <header class="sticky top-0 z-40 bg-navy-950/95 backdrop-blur-md border-b border-slate-800/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Clean Vednova Brand Identity -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <img src="assets/brand-logo.svg" alt="Vednova Logo" class="h-10 w-auto filter drop-shadow group-hover:scale-105 transition transform">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-serif text-xl tracking-[0.16em] font-bold text-white group-hover:text-gold-300 transition">VEDNOVA</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono tracking-wider">
+            POLICY VAULT · FIDUCIARY INSURANCE REVIEW
+          </p>
+        </div>
+      </a>
+
+      <!-- Center Nav Pills -->
+      <nav class="hidden lg:flex items-center gap-1.5 p-1.5 rounded-full bg-navy-900/90 border border-slate-800">
+        <button id="tab-btn-vault" class="px-4 py-2 rounded-full text-xs font-semibold bg-gold-500 text-ink-950 transition">
+          Policy Vault
+        </button>
+        <button id="tab-btn-scenarios" class="px-4 py-2 rounded-full text-xs text-slate-400 hover:text-slate-200 transition">
+          Scenario Explorer
+        </button>
+        <button id="tab-btn-calendar" class="px-4 py-2 rounded-full text-xs text-slate-400 hover:text-slate-200 transition">
+          12-Month Calendar
+        </button>
+        <button id="tab-btn-sip-bridge" class="px-4 py-2 rounded-full text-xs text-slate-400 hover:text-slate-200 transition">
+          Savings-to-SIP
+        </button>
+      </nav>
+
+      <!-- Right Action Tools (Report Exports & Gemini Settings) -->
+      <div class="flex items-center gap-3">
+        <!-- Gemini Key Modal -->
+        <button onclick="openApiKeyModal()" title="Configure Gemini API Key" class="p-2.5 rounded-lg bg-navy-900 border border-slate-800 text-slate-400 hover:text-gold-400 hover:border-gold-500/40 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+          </svg>
+        </button>
+
+        <!-- PDF Export Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="triggerPDFExport('A')" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-navy-800 border border-slate-700 hover:border-gold-500/50 text-xs font-medium text-slate-200 hover:text-white transition">
+            <span>Report A (1-Pg)</span>
+          </button>
+          <button onclick="triggerPDFExport('B')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold-500 hover:bg-gold-400 text-ink-950 font-semibold text-xs transition shadow-lg shadow-gold-500/10">
+            <span>Export Full Dossier</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- PRESTIGIOUS CLIENT BANNER (INDIAN ARMY CLIENT AS PRIMARY DEMO) -->
+    <div class="mb-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-navy-950 via-panel-900 to-navy-950 border border-slate-800 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-48 h-48 bg-gold-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+          <!-- Header Meta Tags -->
+          <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">
+            <span id="client-case-id-badge" class="font-mono font-bold tracking-widest text-gold-400 uppercase">CASE VN-2026-ARMY-01</span>
+            <span class="text-slate-600">·</span>
+            <span class="text-gold-400 font-mono" id="client-firm-display">Distributor: Zenith Wealth Advisors Pvt. Ltd. (ARN-48291)</span>
+            <span class="text-slate-600">·</span>
+            <span class="text-slate-400">SOP v2 Fiduciary Audit</span>
+            <span class="text-slate-600">·</span>
+            <span class="text-emerald-400 font-mono" id="client-rm-display">Serviced by RM: Rahul Sharma (Senior Wealth RM)</span>
+          </div>
+
+          <!-- Client Title & Verified Indian Army Badge -->
+          <div class="flex flex-wrap items-center gap-3 mb-2">
+            <h1 id="client-display-name" class="text-3xl font-serif text-white font-medium">Col. Arvind Rathore</h1>
+            <span id="client-branch-verified-badge" class="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
+              <span>⚔️</span>
+              <span id="client-branch-title-text">Indian Army (Active Field Duty Rules)</span>
+            </span>
+            <span id="client-policy-count-text" class="text-xs text-slate-400 font-mono">6 Policies Audited</span>
+          </div>
+
+          <p class="text-xs text-slate-400 max-w-2xl leading-relaxed" id="client-banner-attribution-text">
+            Prepared under the fiduciary standard of <strong id="client-banner-firm-name">Zenith Wealth Advisors Pvt. Ltd.</strong> · Powered by <strong>Vednova</strong>. All policy cash flows are mathematically audited on a 365-day basis, <span id="client-benchmark-banner-statement">benchmarked against your service-connected <strong>7.10% Tax-Free DSOPF</strong>, and audited for operational military combat/field duty exclusions.</span>
+          </p>
+        </div>
+
+        <!-- Headline Metric Badges -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-navy-950/80 border border-slate-800 p-3.5 rounded-xl min-w-[130px]">
+            <span class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Annual Run Rate</span>
+            <span id="metric-run-rate" class="text-lg font-serif text-slate-200 font-semibold block mt-0.5">₹11.07 L</span>
+            <span class="text-[10px] text-slate-500">Across family policies</span>
+          </div>
+
+          <div class="bg-navy-950/80 border border-emerald-500/30 p-3.5 rounded-xl min-w-[130px]">
+            <span class="text-[10px] uppercase font-mono tracking-wider text-emerald-400 block">Avoided / Ceased</span>
+            <span id="metric-avoided" class="text-lg font-serif text-emerald-400 font-bold block mt-0.5">₹5.07 L</span>
+            <span class="text-[10px] text-emerald-500/80 font-medium">Freed for SIP bridge</span>
+          </div>
+
+          <div class="bg-navy-950/80 border border-slate-800 p-3.5 rounded-xl min-w-[130px]">
+            <span class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Future Outflow Stopped</span>
+            <span id="metric-future" class="text-lg font-serif text-slate-200 font-semibold block mt-0.5">₹68.45 L</span>
+            <span class="text-[10px] text-slate-500">Contractual obligations</span>
+          </div>
+
+          <div class="bg-navy-950/80 border border-gold-500/30 p-3.5 rounded-xl min-w-[130px]">
+            <span class="text-[10px] uppercase font-mono tracking-wider text-gold-400 block">Verdicts</span>
+            <span id="metric-status-counts" class="text-xs font-mono font-bold text-white block mt-1.5">2 Exit | 1 Paid-Up | 3 Keep</span>
+            <span class="text-[10px] text-gold-400/80 font-medium">Definitive direction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: POLICY VAULT & ACTIONABLE VERDICTS -->
+    <section id="panel-vault" class="space-y-6">
+      
+      <!-- Filter Bar & Policy Upload -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0" id="member-filters-container">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+
+        <!-- Gemini 3.8 Flash Upload Dropzone -->
+        <div class="flex items-center gap-3">
+          <input type="file" id="policy-file-input" accept="application/pdf,image/*" class="hidden">
+          <div id="upload-dropzone" class="cursor-pointer px-4 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 border border-dashed border-slate-700 hover:border-gold-500/60 transition flex items-center gap-2 text-xs text-slate-300">
+            <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <span>Add Policy PDF (Gemini 3.8 OCR)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy Cards Grid -->
+      <div id="policy-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically by js/app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 2: SCENARIO EXPLORER, GOLD AUDIT & DSOP BENCHMARK -->
+    <section id="panel-scenarios" class="hidden space-y-8">
+      
+      <!-- ICICI PRU GOLD DEEP DIVE: SGB vs GOLD ETF vs MUTUAL FUNDS -->
+      <div class="bg-panel-800 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-bold text-gold-400 uppercase tracking-widest">SOP v2 Gold Deep Dive</span>
+              <span class="text-slate-600">·</span>
+              <span class="text-xs text-slate-400">P03 / ICICI Pru Gold Audit</span>
+            </div>
+            <h2 class="text-2xl font-serif text-white font-medium">Objective-Based Gold Policy Comparison</h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Compare based on the client's actual intention: Gold Asset Diversification vs. Pure Long-Term Wealth Creation.
+            </p>
+          </div>
+
+          <!-- Intent Selector Toggle -->
+          <div class="bg-navy-950 border border-slate-800 p-1.5 rounded-xl flex items-center gap-1">
+            <button id="gold-intent-div" class="px-4 py-2 rounded-lg text-xs font-semibold bg-gold-500 text-ink-950 transition shadow">
+              Gold Asset Diversification
+            </button>
+            <button id="gold-intent-inv" class="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+              Pure Wealth Investment
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Comparison Cards Container -->
+        <div id="gold-comparison-results-container" class="mb-6">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+
+        <!-- Comprehensive Product Lock-in Matrix -->
+        <div class="mt-6 pt-6 border-t border-slate-800">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3">Product Lock-in & Liquidity Comparison Matrix</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-[10px] text-slate-400 uppercase bg-navy-950 border-b border-slate-800 font-mono">
+                <tr>
+                  <th class="py-3 px-4">Financial Product</th>
+                  <th class="py-3 px-4">Lock-in Period</th>
+                  <th class="py-3 px-4">Exit Penalty After Lock-in</th>
+                  <th class="py-3 px-4">Expected Net Return</th>
+                  <th class="py-3 px-4">Fiduciary Recommendation</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/60 font-medium">
+                <tr class="hover:bg-navy-900/50">
+                  <td class="py-3 px-4 text-white font-serif">ULIPs (P01 / P02)</td>
+                  <td class="py-3 px-4 font-mono text-amber-300">5 Years (Statutory)</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400 font-bold">0% (Zero Exit Charge)</td>
+                  <td class="py-3 px-4 font-mono">6.0%–7.5% (Eaten by FMC/Admin)</td>
+                  <td class="py-3 px-4 text-rose-400 font-bold">SURRENDER AT LOCK-IN</td>
+                </tr>
+                <tr class="hover:bg-navy-900/50">
+                  <td class="py-3 px-4 text-white font-serif">Traditional Gold Policy (P03)</td>
+                  <td class="py-3 px-4 font-mono text-rose-400 font-bold">34 Years (Draconian)</td>
+                  <td class="py-3 px-4 font-mono text-rose-300">Heavy Surrender Deductions</td>
+                  <td class="py-3 px-4 font-mono text-rose-300">1.50% Guaranteed / 3.28% Illus.</td>
+                  <td class="py-3 px-4 text-amber-300 font-bold">CONVERT TO PAID-UP</td>
+                </tr>
+                <tr class="hover:bg-navy-900/50">
+                  <td class="py-3 px-4 text-white font-serif">Sovereign Gold Bonds (SGB)</td>
+                  <td class="py-3 px-4 font-mono text-slate-300">8 Years (RBI Buyback Yr 5)</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400">Zero (Tradable on NSE/BSE)</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400 font-bold">2.5% Coupon + Gold Gain (Tax-Free)</td>
+                  <td class="py-3 px-4 text-emerald-400 font-bold">RECOMMENDED FOR GOLD</td>
+                </tr>
+                <tr class="hover:bg-navy-900/50">
+                  <td class="py-3 px-4 text-white font-serif">Gold ETFs / FoFs</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400 font-bold">ZERO LOCK-IN</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400">Zero (T+1 Liquidity)</td>
+                  <td class="py-3 px-4 font-mono text-slate-300">~7.70% Net CAGR</td>
+                  <td class="py-3 px-4 text-emerald-400 font-bold">RECOMMENDED FOR LIQUIDITY</td>
+                </tr>
+                <tr class="hover:bg-navy-900/50">
+                  <td class="py-3 px-4 text-white font-serif">Diversified Equity Mutual Funds</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400 font-bold">ZERO LOCK-IN (Open-ended)</td>
+                  <td class="py-3 px-4 font-mono text-emerald-400">1% for 1 yr, 0% thereafter</td>
+                  <td class="py-3 px-4 font-mono text-gold-300 font-bold">12.0% Historical CAGR</td>
+                  <td class="py-3 px-4 text-gold-400 font-bold">RECOMMENDED FOR WEALTH</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payout Frequency Comparator (Annual vs Monthly vs Lump Sum) -->
+      <div class="bg-panel-800 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="mb-6 pb-6 border-b border-slate-800">
+          <span class="text-xs font-bold text-gold-400 uppercase tracking-widest">SOP v2 Payout Optimization</span>
+          <h2 class="text-2xl font-serif text-white font-medium">Payout Frequency Comparison: ICICI Pru GIFT (P04)</h2>
+          <p class="text-xs text-slate-400 mt-1">Comparing how annual vs monthly vs commuted lump sum affects the policy's net XIRR.</p>
+        </div>
+
+        <div id="payout-frequency-table">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+      </div>
+
+      <!-- Equal-Budget Equity Comparison & Surrender Solver -->
+      <div class="bg-panel-800 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-bold text-gold-400 uppercase tracking-widest">SOP v2 Equal-Budget Analysis</span>
+            <h2 class="text-2xl font-serif text-white font-medium">Surrender Quote Hurdle (S) Solver</h2>
+            <p class="text-xs text-slate-400 mt-1">Calculates the exact cheque required today for surrender to beat retaining paid-up benefits.</p>
+          </div>
+
+          <div class="bg-navy-950 border border-slate-800 p-4 rounded-xl flex items-center gap-4 min-w-[280px]">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase tracking-wider block">Equity Reinvestment</span>
+              <strong id="return-slider-val" class="text-gold-300 font-mono text-lg">8% p.a.</strong>
+            </div>
+            <input id="return-slider" type="range" min="6" max="14" step="1" value="8" class="flex-1 accent-gold-500 cursor-pointer">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Minimum Surrender Value Required (S)</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              If the insurer quote received is <strong>less</strong> than the threshold below, surrendering destroys wealth—the policy must be retained or converted to Paid-Up.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 pt-2">
+              <div class="bg-navy-950 border border-slate-800 p-4 rounded-xl">
+                <span class="text-xs text-slate-400 font-medium block">P04 / GIFT Long-Term</span>
+                <div id="hurdle-p04-val" class="text-xl font-serif text-gold-300 font-bold mt-1">—</div>
+                <span class="text-[11px] text-slate-500 mt-1 block">Cheque required today</span>
+              </div>
+              <div class="bg-navy-950 border border-slate-800 p-4 rounded-xl">
+                <span class="text-xs text-slate-400 font-medium block">P05 / GIFT Pro</span>
+                <div id="hurdle-p05-val" class="text-xl font-serif text-gold-300 font-bold mt-1">—</div>
+                <span class="text-[11px] text-slate-500 mt-1 block">Cheque required today</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sovereign DSOP Comparison -->
+          <div class="p-5 rounded-xl bg-navy-950/80 border border-slate-800 space-y-3">
+            <h3 id="sovereign-comparison-heading" class="text-sm font-bold uppercase tracking-wider text-slate-300">Why ICICI Pru Gold Loses to DSOP</h3>
+            <p id="sovereign-comparison-intro" class="text-xs text-slate-400 leading-relaxed">
+              ICICI Pru Gold demands 6 more annual payments of ₹3,00,000 (total ₹18 Lakhs).
+            </p>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-rose-950/30 border border-rose-500/40 rounded-lg">
+                <span class="text-slate-400 block text-[10px]">ICICI PRU GOLD</span>
+                <strong class="text-rose-300 text-sm">1.63% Incremental</strong>
+                <span class="text-slate-500 block text-[10px] mt-1">₹30,150/yr income</span>
+              </div>
+              <div class="p-3 bg-blue-950/40 border border-blue-500/40 rounded-lg">
+                <span class="text-slate-400 block text-[10px]" id="dsop-benchmark-label">DSOP FUND (ARMY)</span>
+                <strong class="text-blue-300 text-sm" id="dsop-benchmark-rate">7.10% Sovereign</strong>
+                <span class="text-slate-500 block text-[10px] mt-1" id="dsop-benchmark-sub">Tax-Free & Zero Deductions</span>
+              </div>
+            </div>
+            <p id="sovereign-comparison-conclusion" class="text-[11px] text-slate-400">
+              Converting Gold to Paid-Up retains all current guarantees while stopping a 5.47% annual leak against your own defence provident fund.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 12-MONTH CALENDAR -->
+    <section id="panel-calendar" class="hidden space-y-6">
+      <div class="bg-panel-800 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="mb-6">
+          <span class="text-xs font-bold text-gold-400 uppercase tracking-widest">Deadlines & Action Timing</span>
+          <h2 class="text-2xl font-serif text-white font-medium">Next 12 Months Action & Premium Calendar</h2>
+          <p class="text-xs text-slate-400 mt-1">Clear roadmap of what to surrender, what to convert to paid-up, and what to continue.</p>
+        </div>
+
+        <div id="calendar-schedule-list" class="space-y-3">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: DYNAMIC SAVINGS-TO-SIP BRIDGE -->
+    <section id="panel-sip-bridge" class="hidden space-y-6">
+      <div class="bg-panel-800 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="mb-6 pb-6 border-b border-slate-800">
+          <span class="text-xs font-bold text-gold-400 uppercase tracking-widest">Vednova Core Flywheel</span>
+          <h2 class="text-2xl font-serif text-white font-medium">The "Savings-to-SIP" Compounding Bridge</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Dynamically select which policies to stop or surrender. Watch annual avoided premiums fund disciplined long-term mutual fund wealth.
+          </p>
+        </div>
+
+        <!-- Dynamic Policy Selector Container -->
+        <div class="mb-8 p-5 bg-navy-950/90 border border-slate-800 rounded-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="text-sm font-serif font-bold text-white uppercase tracking-wider">Select Policies to Redirect into SIP</h3>
+              <p class="text-xs text-slate-400">Toggle policies below to immediately update the annual avoided premium and compounding math.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span id="sip-selected-count-badge" class="text-xs font-mono text-gold-400 bg-gold-500/10 border border-gold-500/30 px-2.5 py-1 rounded">
+                3 Policies Selected
+              </span>
+              <button id="sip-btn-select-rec" class="px-2.5 py-1 rounded text-xs bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+                Recommended
+              </button>
+              <button id="sip-btn-select-all" class="px-2.5 py-1 rounded text-xs bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+                All
+              </button>
+              <button id="sip-btn-clear" class="px-2.5 py-1 rounded text-xs bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Checkbox List -->
+          <div id="sip-policy-selector-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Rendered dynamically by js/app.js -->
+          </div>
+        </div>
+
+        <!-- Avoided Premium & SIP Calculations -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-navy-950 border border-slate-800 p-5 rounded-xl">
+            <span class="text-xs text-slate-500 uppercase tracking-wider block">Selected Annual Avoided Premiums</span>
+            <div id="sip-annual-avoided" class="text-3xl font-serif text-emerald-400 font-bold mt-1">—</div>
+            <p class="text-xs text-slate-400 mt-2">Freed from selected insurance policies and redeployed into market-beating assets.</p>
+          </div>
+          <div class="bg-navy-950 border border-slate-800 p-5 rounded-xl">
+            <span class="text-xs text-slate-500 uppercase tracking-wider block">Equivalent Monthly SIP</span>
+            <div id="sip-monthly-amount" class="text-3xl font-serif text-gold-300 font-bold mt-1">—</div>
+            <p class="text-xs text-slate-400 mt-2">Investable monthly across broad diversified index/equity mutual funds.</p>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Long-Term Wealth Projection (12% p.a. Compounding)</h3>
+        <div id="sip-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- EMBEDDED AI COPILOT DRAWER -->
+    <div class="mt-8 bg-navy-950/80 border border-slate-800 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+          <h2 class="text-base font-serif font-medium text-white">Vednova AI Policy Copilot</h2>
+          <span class="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded">Gemini 3.8 Flash</span>
+        </div>
+        <span class="text-xs text-slate-500 font-mono">Grounded in SOP v2 Rules</span>
+      </div>
+
+      <!-- Quick Prompt Chips -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-3 text-xs">
+        <span class="text-[10px] text-slate-500 font-mono uppercase">Prompts:</span>
+        <button data-prompt="Why should I surrender P01 Signature Advantage on 18 Sep 2026?" class="copilot-preset whitespace-nowrap px-3 py-1 rounded-full bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+          🔒 Why Surrender Signature at Lock-in?
+        </button>
+        <button data-prompt="How does ICICI Pru Gold compare to SGBs and Gold ETFs?" class="copilot-preset whitespace-nowrap px-3 py-1 rounded-full bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+          🏅 Gold Policy vs. SGB & ETF
+        </button>
+        <button id="copilot-preset-sovereign" data-prompt="How does ICICI Pru Gold compare to my 7.10% DSOP fund?" class="copilot-preset whitespace-nowrap px-3 py-1 rounded-full bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+          🛡️ ICICI Gold vs. 7.10% DSOP
+        </button>
+        <button data-prompt="Explain the difference between annual income and maturity lump sum for GIFT." class="copilot-preset whitespace-nowrap px-3 py-1 rounded-full bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+          📈 Annual Income vs. Lump Sum XIRR
+        </button>
+        <button id="copilot-preset-exclusions" data-prompt="What are the specific armed forces exclusions on P03?" class="copilot-preset whitespace-nowrap px-3 py-1 rounded-full bg-navy-900 hover:bg-navy-800 text-slate-300 border border-slate-700 hover:border-gold-500/40 transition">
+          ⚔️ Army Field Duty Exclusions
+        </button>
+      </div>
+
+      <!-- Messages Window -->
+      <div id="copilot-messages" class="h-64 overflow-y-auto custom-scrollbar bg-navy-950/60 p-4 rounded-xl border border-slate-800/80 mb-4">
+        <!-- Rendered dynamically by js/app.js -->
+      </div>
+
+      <!-- Input Form -->
+      <form id="copilot-form" class="flex gap-2">
+        <input id="copilot-input" type="text" placeholder="Ask Gemini about policy verdicts, SGB comparisons, DSOP math, or surrender hurdles..." class="flex-1 bg-navy-900 border border-slate-700 focus:border-gold-500 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none transition">
+        <button type="submit" class="px-5 py-3 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-gold-500/10">
+          <span>Ask</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- FOOTER (DISCREET CO-BRANDING NOTICE) -->
+  <footer class="bg-navy-950 border-t border-slate-800/80 mt-12 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-3">
+        <img id="footer-firm-logo" src="assets/brand-logo.svg" alt="Logo" class="h-6 w-auto opacity-70">
+        <span id="footer-firm-attribution">Prepared under the fiduciary standard of <strong id="footer-firm-name">Zenith Wealth Advisors Pvt. Ltd.</strong> <span id="footer-firm-year">(Est. 2004)</span> · Powered by <strong>Vednova</strong></span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>SOP v2 Compliant</span>
+        <span>·</span>
+        <span class="text-gold-500/80">✦</span>
+        <a href="https://www.vednova.in" target="_blank" class="hover:text-gold-400 transition">www.vednova.in</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Scripts -->
+  <script src="js/mock-db.js"></script>
+  <script src="js/math-engine.js"></script>
+  <script src="js/sop-rules.js"></script>
+  <script src="js/gemini-engine.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

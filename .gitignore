@@ -1,0 +1,8 @@
+# Dependency and system files
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Logs and scratch tests
+*.log
+scratch/

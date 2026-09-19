@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MFD Sign In — Vednova Fiduciary Suite</title>
+  <meta name="description" content="Sign in to your Vednova MFD Admin Portal. Manage client policy vaults, RM teams, and fiduciary audit dossiers.">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 900: '#070f1a', 950: '#04080f' },
+            navy: { 700: '#152438', 800: '#0d1827', 900: '#08111d', 950: '#050c16' },
+            panel: { 800: '#0f1f33', 900: '#0a1524' },
+            gold: {
+              300: '#f7dfa8',
+              400: '#eed08f',
+              500: '#e1bc70',
+              600: '#c59d4f',
+              700: '#9d7832'
+            }
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #04080f;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(ellipse at 15% 15%, rgba(21, 36, 56, 0.6), transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(225, 188, 112, 0.05), transparent 45%);
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-slate-200 selection:bg-gold-500 selection:text-ink-950">
+
+  <!-- TOP HEADER (PURE VEDNOVA BRANDING) -->
+  <header class="sticky top-0 z-40 bg-navy-950/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="mfd-landing.html" class="flex items-center gap-3 group">
+        <img src="assets/brand-logo.svg" alt="Vednova Logo" class="h-10 w-auto filter drop-shadow group-hover:scale-105 transition transform">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-serif text-xl tracking-[0.16em] font-bold text-white group-hover:text-gold-300 transition">VEDNOVA</span>
+            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-gold-500/15 text-gold-400 border border-gold-500/30">
+              FOR MFDs
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono tracking-wider">
+            DISTRIBUTOR PORTAL SIGN IN
+          </p>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden sm:inline text-xs text-slate-400">New distributor partner?</span>
+        <a href="mfd-signup.html" class="px-3.5 py-2 rounded-lg border border-gold-500/40 text-gold-300 hover:bg-gold-500/10 font-semibold text-xs transition">
+          Sign Up Free (₹0) →
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LOGIN AREA -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col justify-center">
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+      <!-- LEFT: Sign In Form (7 cols) -->
+      <div class="lg:col-span-7 bg-panel-800/90 border border-slate-800 rounded-2xl p-7 sm:p-9 shadow-2xl relative">
+        
+        <div class="mb-6">
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-navy-900 border border-gold-500/30 text-gold-300 text-[11px] font-mono mb-3">
+            <span>🛡️</span>
+            <span>AMFI Registered Distributor Portal</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-serif text-white font-medium mb-1.5">
+            Sign In to MFD Suite
+          </h1>
+          <p class="text-xs text-slate-400">
+            Access your firm's audited client portfolios, team RMs, and fiduciary dossiers.
+          </p>
+        </div>
+
+        <!-- Error Banner (Hidden by Default) -->
+        <div id="login-error-box" class="hidden mb-5 p-3 rounded-lg bg-rose-500/15 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+          <span class="text-base">⚠️</span>
+          <span id="login-error-message">Invalid credentials.</span>
+        </div>
+
+        <!-- SSO Quick Buttons -->
+        <div class="space-y-2.5 mb-5">
+          <button type="button" onclick="openSSOModal('google')" class="w-full py-2.5 px-4 rounded-xl bg-navy-950 hover:bg-navy-900 border border-slate-700 hover:border-slate-600 text-xs font-semibold text-white transition flex items-center justify-center gap-2.5 shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+
+          <button type="button" onclick="openSSOModal('microsoft')" class="w-full py-2.5 px-4 rounded-xl bg-navy-950 hover:bg-navy-900 border border-slate-700 hover:border-slate-600 text-xs font-semibold text-white transition flex items-center justify-center gap-2.5 shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 23 23">
+              <path fill="#f35325" d="M1 1h10v10H1z"/>
+              <path fill="#81bc06" d="M12 1h10v10H12z"/>
+              <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+              <path fill="#ffba08" d="M12 12h10v10H12z"/>
+            </svg>
+            <span>Continue with Microsoft Outlook</span>
+          </button>
+        </div>
+
+        <div class="relative flex items-center justify-center mb-5">
+          <div class="border-t border-slate-800 w-full"></div>
+          <span class="bg-panel-800 px-3 text-[10px] font-mono text-slate-500 uppercase tracking-wider relative">or sign in with AMFI credentials</span>
+        </div>
+
+        <form id="mfd-login-form" onsubmit="handleMfdLogin(event)" class="space-y-4">
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">
+              AMFI ARN or Official Email (Admin or RM) <span class="text-rose-400">*</span>
+            </label>
+            <input type="text" id="login-arn" required placeholder="e.g. ARN-48291, rohit.dev@zenithwealth.in, or rahul.s@zenithwealth.in"
+                   class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-sm text-white font-mono focus:outline-none focus:border-gold-400 transition">
+            <span class="text-[10.5px] text-slate-500 mt-1 block">
+              Distributor Admins sign in via AMFI ARN or Email. Relationship Managers & Advisors sign in via official firm email.
+            </span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-slate-300">
+                Security Password / PIN <span class="text-rose-400">*</span>
+              </label>
+              <span class="text-[11px] text-slate-500 font-mono">Default: password123</span>
+            </div>
+            <input type="password" id="login-password" required value="password123"
+                   class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-sm text-white font-mono focus:outline-none focus:border-gold-400 transition">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+              <input type="checkbox" checked class="rounded bg-navy-950 border-slate-700 text-gold-500 focus:ring-0">
+              <span>Remember account on this browser</span>
+            </label>
+            <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-gold-400 hover:text-gold-300 transition underline">Forgot credentials?</button>
+          </div>
+
+          <div class="pt-3">
+            <button type="submit" class="w-full py-3 px-6 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-sm transition shadow-xl shadow-gold-500/20 flex items-center justify-center gap-2">
+              <span>Sign In to Distributor Portal</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-6 pt-5 border-t border-slate-800 text-center text-xs text-slate-400">
+          <span>Don't have an MFD firm registered?</span>
+          <a href="mfd-signup.html" class="text-gold-400 hover:text-gold-300 font-semibold ml-1">
+            Register Free Under ₹0 Founding Tier →
+          </a>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: 1-Click Quick Demo Switcher Cards (5 cols) -->
+      <div class="lg:col-span-5 space-y-3.5">
+        
+        <div class="text-left mb-1">
+          <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400 font-bold block">
+            DEMO & ROLE SWITCHER ACCOUNTS
+          </span>
+          <p class="text-xs text-slate-500">1-click sign in as Principal Admin vs. Servicing RM:</p>
+        </div>
+
+        <!-- Account 1: Zenith Wealth Advisors (Admin: Rohit Dev) -->
+        <div class="p-4 rounded-xl bg-panel-800/80 hover:bg-panel-800 border border-slate-800 hover:border-gold-500/40 transition cursor-pointer group shadow"
+             onclick="quickLogin('ARN-48291', 'password123')">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-mono font-bold text-gold-400 px-2 py-0.5 rounded bg-gold-500/10 border border-gold-500/20">
+              ARN-48291 · 👑 ADMIN
+            </span>
+            <span class="text-[10px] text-slate-500 font-mono">Zenith Wealth</span>
+          </div>
+          <h3 class="text-sm font-serif text-white font-medium group-hover:text-gold-300 transition">
+            Rohit Dev (Principal MFD Admin)
+          </h3>
+          <p class="text-[11px] text-slate-400">Full firm access, all client vaults, RM team management & branding.</p>
+          <div class="flex items-center justify-between text-xs text-gold-400 font-semibold pt-2 mt-2 border-t border-slate-800/80">
+            <span>⚡ Sign in as Admin Partner</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <!-- Account 2: Zenith Wealth Advisors (RM: Rahul Sharma) -->
+        <div class="p-4 rounded-xl bg-panel-800/80 hover:bg-panel-800 border border-slate-800 hover:border-sky-500/40 transition cursor-pointer group shadow"
+             onclick="quickLogin('rahul.s@zenithwealth.in', 'password123')">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-mono font-bold text-sky-400 px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20">
+              RM DESK · 👤 SERVICING RM
+            </span>
+            <span class="text-[10px] text-slate-500 font-mono">Zenith Wealth</span>
+          </div>
+          <h3 class="text-sm font-serif text-white font-medium group-hover:text-sky-300 transition">
+            Rahul Sharma (Senior Wealth RM)
+          </h3>
+          <p class="text-[11px] text-slate-400">Directly redirected to his Zenith servicing portal & assigned defence clients.</p>
+          <div class="flex items-center justify-between text-xs text-sky-400 font-semibold pt-2 mt-2 border-t border-slate-800/80">
+            <span>⚡ Sign in as Relationship Manager</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <!-- Account 3: Apex Wealth Partners (Managing Partner: Sunil Mehta) -->
+        <div class="p-4 rounded-xl bg-panel-800/80 hover:bg-panel-800 border border-slate-800 hover:border-emerald-500/40 transition cursor-pointer group shadow"
+             onclick="quickLogin('ARN-887766', 'password123')">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+              ARN-887766 · 👑 ADMIN
+            </span>
+            <span class="text-[10px] text-slate-500 font-mono">Apex Wealth</span>
+          </div>
+          <h3 class="text-sm font-serif text-white font-medium group-hover:text-emerald-300 transition">
+            Sunil Mehta (Managing Partner)
+          </h3>
+          <p class="text-[11px] text-slate-400">Apex Wealth Partners firm-wide administration & client audits.</p>
+          <div class="flex items-center justify-between text-xs text-emerald-400 font-semibold pt-2 mt-2 border-t border-slate-800/80">
+            <span>⚡ Sign in as Apex Partner</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <!-- Account 4: Apex Wealth Partners (RM: Karan Malhotra) -->
+        <div class="p-4 rounded-xl bg-panel-800/80 hover:bg-panel-800 border border-slate-800 hover:border-purple-500/40 transition cursor-pointer group shadow"
+             onclick="quickLogin('karan@apexwealth.in', 'password123')">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-mono font-bold text-purple-400 px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20">
+              RM DESK · 👤 SERVICING RM
+            </span>
+            <span class="text-[10px] text-slate-500 font-mono">Apex Wealth</span>
+          </div>
+          <h3 class="text-sm font-serif text-white font-medium group-hover:text-purple-300 transition">
+            Karan Malhotra (Senior Advisor RM)
+          </h3>
+          <p class="text-[11px] text-slate-400">Redirected to Apex Wealth RM portal with his assigned equity clients.</p>
+          <div class="flex items-center justify-between text-xs text-purple-400 font-semibold pt-2 mt-2 border-t border-slate-800/80">
+            <span>⚡ Sign in as Apex RM</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <!-- Client redirect reminder -->
+        <div class="p-4 rounded-xl bg-navy-950/60 border border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+          <span class="text-slate-300 font-semibold block mb-1">Looking for your individual family vault?</span>
+          <span>Retail and defence clients can look up their audit via the </span>
+          <a href="insurance-advisory.html" class="text-gold-400 hover:underline">Client Advisory Portal →</a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-navy-950 border-t border-slate-800/80 py-8 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-3">
+        <img src="assets/brand-logo.svg" alt="Logo" class="h-6 w-auto opacity-70">
+        <span><strong>Vednova</strong> · Institutional Wealth & Policy Audit Infrastructure for MFDs</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="mfd-landing.html" class="hover:text-gold-400 transition">MFD Suite Overview</a>
+        <span>·</span>
+        <a href="mfd-signup.html" class="hover:text-gold-400 transition">Register Firm (₹0)</a>
+        <span>·</span>
+        <a href="index.html?caseId=VN-2026-ARMY-01" class="hover:text-gold-400 transition">Army Demo Vault</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING DEVICE NOTIFICATION / SIMULATED SMS TOAST -->
+  <div id="device-sms-toast" class="fixed top-5 right-5 z-[9999] max-w-sm w-full bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl shadow-2xl p-4 transition-all duration-500 transform -translate-y-24 opacity-0 pointer-events-none">
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0 text-base">
+        💬
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between gap-2 mb-0.5">
+          <span class="text-[11px] font-bold text-white uppercase tracking-wider">SMS · VEDNOVA SECURITY</span>
+          <span class="text-[10px] text-slate-400 font-mono">Just now</span>
+        </div>
+        <p class="text-xs text-slate-200 leading-snug">
+          Your one-time security code is <strong id="sms-toast-code" class="text-emerald-400 font-mono text-sm tracking-widest font-bold">------</strong>. Valid for 10 mins. Do not share.
+        </p>
+        <div class="mt-2.5 flex items-center gap-2">
+          <button type="button" onclick="copyOtpAndPaste()" class="text-[11px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1 cursor-pointer">
+            <span>📋 Copy & Fill OTP</span>
+          </button>
+          <button type="button" onclick="dismissSmsToast()" class="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-1 cursor-pointer">
+            Dismiss
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: FORGOT PASSWORD / ACCOUNT RECOVERY -->
+  <div id="forgot-password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-base font-serif font-bold text-white flex items-center gap-2">
+            <span>🔑 Account Credential Recovery</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Reset your distributor portal password or contact your firm admin.</p>
+        </div>
+        <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <!-- Recovery Tabs -->
+      <div class="flex items-center gap-2 mb-5 p-1 bg-navy-950 rounded-xl border border-slate-800">
+        <button type="button" id="tab-recovery-admin" onclick="switchRecoveryTab('admin')" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-gold-500 text-ink-950 transition">
+          👑 Firm Principal / Partner
+        </button>
+        <button type="button" id="tab-recovery-rm" onclick="switchRecoveryTab('rm')" class="flex-1 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">
+          👤 Relationship Manager / Advisor
+        </button>
+      </div>
+
+      <!-- ADMIN RECOVERY VIEW -->
+      <div id="recovery-panel-admin" class="space-y-4">
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Principal Admins and Business Partners can reset their security password via their registered AMFI ARN or official email.
+        </p>
+
+        <!-- Step 1: Input ARN/Email -->
+        <div id="admin-reset-step1" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">
+              Registered AMFI ARN or Admin Email <span class="text-rose-400">*</span>
+            </label>
+            <input type="text" id="reset-admin-identifier" placeholder="e.g. ARN-48291 or rohit.dev@zenithwealth.in" class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-xs text-white font-mono focus:border-gold-400 focus:outline-none">
+          </div>
+          <div id="admin-reset-error" class="hidden p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs"></div>
+          <button type="button" onclick="sendAdminResetOTP()" class="w-full py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
+            <span>Send Verification OTP</span>
+            <span>→</span>
+          </button>
+        </div>
+
+        <!-- Step 2: OTP & New Password (Hidden until OTP sent) -->
+        <div id="admin-reset-step2" class="hidden space-y-3.5">
+          <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs space-y-1.5">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Security Code Dispatched</span>
+            </div>
+            <p class="text-slate-300 text-[11.5px] leading-relaxed">
+              A 6-digit verification code was sent to your registered email <strong id="display-masked-email" class="text-white font-mono">r****@zenithwealth.in</strong> and mobile SMS <strong id="display-masked-phone" class="text-white font-mono">+91 98*** ***10</strong>.
+            </p>
+            <span class="text-[10px] text-slate-400 block">Valid for 10 minutes. Please enter the code below to verify your identity.</span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-slate-300">Enter 6-Digit OTP <span class="text-rose-400">*</span></label>
+              <button type="button" id="btn-resend-otp" onclick="resendAdminResetOTP()" class="text-[11px] text-gold-400 hover:text-gold-300 font-mono disabled:opacity-40 disabled:cursor-not-allowed">
+                Resend in <span id="resend-countdown">30</span>s
+              </button>
+            </div>
+            <input type="text" id="reset-admin-otp" placeholder="• • • • • •" maxlength="6" class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-base text-white font-mono focus:border-gold-400 focus:outline-none tracking-widest text-center">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">New Security Password / PIN <span class="text-rose-400">*</span></label>
+            <input type="password" id="reset-admin-new-pass" placeholder="Enter new password (min 4 characters)" class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-xs text-white font-mono focus:border-gold-400 focus:outline-none">
+          </div>
+
+          <div id="admin-step2-error" class="hidden p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs"></div>
+
+          <button type="button" onclick="submitAdminPasswordReset()" class="w-full py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
+            <span>Verify Code & Update Password</span>
+            <span>✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- RM RECOVERY VIEW -->
+      <div id="recovery-panel-rm" class="hidden space-y-4">
+        <div class="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs text-sky-200 flex items-start gap-2.5">
+          <span class="text-base mt-0.5">🛡️</span>
+          <div class="leading-relaxed">
+            <strong class="text-white block mb-0.5">Managed Team Member Policy:</strong>
+            <span>Relationship Manager credentials are centrally managed by your firm's Principal Admin. You do not need to register again. Contact your firm admin to reset your password.</span>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">
+              Your Official RM Email
+            </label>
+            <input type="email" id="lookup-rm-email" placeholder="e.g. rahul.s@zenithwealth.in or karan@apexwealth.in" class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-xs text-white font-mono focus:border-gold-400 focus:outline-none">
+          </div>
+
+          <button type="button" onclick="lookupRmAdminContact()" class="w-full py-2 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 border border-slate-700">
+            <span>Look Up My Firm Admin Contact</span>
+            <span>🔍</span>
+          </button>
+        </div>
+
+        <!-- RM Admin Info Box (Rendered upon lookup) -->
+        <div id="rm-admin-contact-result" class="hidden p-4 rounded-xl bg-navy-950 border border-slate-800 space-y-3 text-xs">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: ENTERPRISE SSO OAUTH DIALOG (GOOGLE & MICROSOFT) -->
+  <div id="sso-account-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl relative">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3.5 mb-5 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="sso-modal-icon" class="w-9 h-9 rounded-xl bg-navy-950 border border-slate-700 flex items-center justify-center p-2 shadow-inner">
+            <!-- Dynamic provider logo -->
+          </div>
+          <div>
+            <h3 id="sso-modal-title" class="text-sm font-serif font-bold text-white">Sign In with Google</h3>
+            <p id="sso-modal-sub" class="text-[11px] text-slate-400">to continue to Vednova Policy Vault</p>
+          </div>
+        </div>
+        <button onclick="closeSSOModal()" class="text-slate-400 hover:text-white text-lg px-2 rounded-lg hover:bg-slate-800/60 transition">✕</button>
+      </div>
+
+      <!-- Main SSO Form (Private, zero client/distributor exposure) -->
+      <div id="sso-form-view" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1.5" id="sso-input-label">
+            Google Workspace Corporate Email
+          </label>
+          <input type="email" id="sso-email-input" placeholder="e.g. advisor@yourfirm.in" 
+                 onkeydown="if(event.key==='Enter') submitSSOOAuth()" 
+                 class="w-full px-3.5 py-2.5 bg-navy-950 border border-slate-700 rounded-lg text-sm text-white font-mono focus:border-gold-400 focus:outline-none transition">
+          <p class="text-[11px] text-slate-400 mt-1.5">
+            Enter the authorized email associated with your distributor firm or advisor account.
+          </p>
+        </div>
+
+        <!-- Privacy & Security Notice -->
+        <div class="p-3 rounded-xl bg-navy-950/60 border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
+          <span class="text-sm text-gold-400">🛡️</span>
+          <span>Enterprise Tenant Privacy: Firm credentials and rosters are strictly isolated and confidential.</span>
+        </div>
+
+        <!-- Dynamic Error Box for Unregistered Accounts -->
+        <div id="sso-error-box" class="hidden p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-2">
+          <div class="font-bold flex items-center gap-1.5 text-rose-300">
+            <span>⚠️ Account Not Registered</span>
+          </div>
+          <p id="sso-error-message" class="leading-relaxed text-[11px] text-rose-200">
+            No authorized distributor firm or advisor account found for this email.
+          </p>
+          <div class="pt-1.5 border-t border-rose-500/20 flex items-center justify-between gap-2">
+            <span class="text-[10px] text-slate-400">New distributor firm?</span>
+            <a id="sso-signup-link" href="mfd-signup.html" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-white font-bold rounded-lg text-[11px] transition shadow">
+              Register Firm Free (₹0) →
+            </a>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeSSOModal()" class="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition">
+            Cancel
+          </button>
+          <button type="button" id="btn-submit-sso" onclick="submitSSOOAuth()" class="px-5 py-2.5 bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-gold-500/20">
+            <span id="sso-submit-btn-text">Continue with Google</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State (hidden by default) -->
+      <div id="sso-loading-view" class="hidden py-8 text-center space-y-3">
+        <div class="w-8 h-8 mx-auto border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
+        <div id="sso-loading-text" class="text-xs text-slate-200 font-medium">
+          Verifying credentials with Google Workspace...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mock DB script -->
+  <script src="js/mock-db.js"></script>
+  <script>
+    let currentSSOProvider = 'google';
+
+    function quickLogin(arn, password) {
+      document.getElementById('login-arn').value = arn;
+      document.getElementById('login-password').value = password;
+      doLogin(arn, password);
+    }
+
+    function handleMfdLogin(e) {
+      e.preventDefault();
+      const arn = document.getElementById('login-arn').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      doLogin(arn, password);
+    }
+
+    function doLogin(arn, password) {
+      const errorBox = document.getElementById('login-error-box');
+      errorBox.classList.add('hidden');
+
+      const result = VednovaDB.login(arn, password);
+      if (result.success) {
+        window.location.href = 'mfd-admin.html';
+      } else {
+        document.getElementById('login-error-message').textContent = result.message || 'Invalid credentials.';
+        errorBox.classList.remove('hidden');
+      }
+    }
+
+    // ==================== FORGOT PASSWORD RECOVERY FLOW ====================
+    function openForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.remove('hidden');
+      switchRecoveryTab('admin');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.add('hidden');
+    }
+
+    function switchRecoveryTab(tab) {
+      const btnAdmin = document.getElementById('tab-recovery-admin');
+      const btnRm = document.getElementById('tab-recovery-rm');
+      const panelAdmin = document.getElementById('recovery-panel-admin');
+      const panelRm = document.getElementById('recovery-panel-rm');
+
+      if (tab === 'admin') {
+        btnAdmin.className = 'flex-1 py-2 rounded-lg text-xs font-semibold bg-gold-500 text-ink-950 transition';
+        btnRm.className = 'flex-1 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        panelAdmin.classList.remove('hidden');
+        panelRm.classList.add('hidden');
+      } else {
+        btnAdmin.className = 'flex-1 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+        btnRm.className = 'flex-1 py-2 rounded-lg text-xs font-semibold bg-gold-500 text-ink-950 transition';
+        panelAdmin.classList.add('hidden');
+        panelRm.classList.remove('hidden');
+      }
+    }
+
+    let resendTimerInterval = null;
+
+    function sendAdminResetOTP() {
+      const identifier = document.getElementById('reset-admin-identifier').value.trim();
+      const errBox = document.getElementById('admin-reset-error');
+      errBox.classList.add('hidden');
+
+      if (!identifier) {
+        errBox.textContent = 'Please enter your registered AMFI ARN or admin email address.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      const res = VednovaDB.generateAdminResetOTP(identifier);
+      if (!res.success) {
+        errBox.textContent = res.message || 'No registered distributor account found.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // Populate masked destination
+      document.getElementById('display-masked-email').textContent = res.maskedEmail;
+      document.getElementById('display-masked-phone').textContent = res.maskedPhone;
+      document.getElementById('reset-admin-otp').value = '';
+      document.getElementById('reset-admin-new-pass').value = '';
+
+      // Switch to Step 2
+      document.getElementById('admin-reset-step1').classList.add('hidden');
+      document.getElementById('admin-reset-step2').classList.remove('hidden');
+
+      // Trigger simulated SMS notification banner
+      triggerSmsNotification(res.otp);
+
+      // Start Resend Countdown
+      startResendCountdown();
+    }
+
+    function triggerSmsNotification(otp) {
+      const toast = document.getElementById('device-sms-toast');
+      document.getElementById('sms-toast-code').textContent = otp;
+
+      toast.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      // Auto dismiss after 15 seconds if unclicked
+      setTimeout(() => {
+        dismissSmsToast();
+      }, 15000);
+    }
+
+    function dismissSmsToast() {
+      const toast = document.getElementById('device-sms-toast');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+      toast.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+    }
+
+    function copyOtpAndPaste() {
+      const code = document.getElementById('sms-toast-code').textContent.trim();
+      const otpInput = document.getElementById('reset-admin-otp');
+      if (otpInput) {
+        otpInput.value = code;
+        otpInput.focus();
+        otpInput.classList.add('border-emerald-400');
+        setTimeout(() => otpInput.classList.remove('border-emerald-400'), 1500);
+      }
+      dismissSmsToast();
+    }
+
+    function startResendCountdown() {
+      clearInterval(resendTimerInterval);
+      let count = 30;
+      const btn = document.getElementById('btn-resend-otp');
+      const span = document.getElementById('resend-countdown');
+      btn.disabled = true;
+      span.textContent = count;
+
+      resendTimerInterval = setInterval(() => {
+        count--;
+        if (count <= 0) {
+          clearInterval(resendTimerInterval);
+          btn.disabled = false;
+          btn.textContent = 'Resend Code Now';
+        } else {
+          span.textContent = count;
+        }
+      }, 1000);
+    }
+
+    function resendAdminResetOTP() {
+      const identifier = document.getElementById('reset-admin-identifier').value.trim();
+      const res = VednovaDB.generateAdminResetOTP(identifier);
+      if (res.success) {
+        triggerSmsNotification(res.otp);
+        startResendCountdown();
+      }
+    }
+
+    function submitAdminPasswordReset() {
+      const identifier = document.getElementById('reset-admin-identifier').value.trim();
+      const otp = document.getElementById('reset-admin-otp').value.trim();
+      const newPass = document.getElementById('reset-admin-new-pass').value.trim();
+      const errBox = document.getElementById('admin-step2-error');
+      errBox.classList.add('hidden');
+
+      if (!otp || otp.length < 6) {
+        errBox.textContent = 'Please enter the 6-digit verification code received.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (!newPass || newPass.length < 4) {
+        errBox.textContent = 'Please enter a valid security password (minimum 4 characters).';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      const res = VednovaDB.verifyAdminResetOTP(identifier, otp, newPass);
+      if (res.success) {
+        alert(`Password successfully updated for ${res.firm.firmName} (${res.firm.arn})!\n\nYou can now sign in with your new password.`);
+        closeForgotPasswordModal();
+        dismissSmsToast();
+        document.getElementById('login-arn').value = res.firm.arn;
+        document.getElementById('login-password').value = newPass;
+      } else {
+        errBox.textContent = res.message || 'Verification failed. Please check the code.';
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    function lookupRmAdminContact() {
+      const email = document.getElementById('lookup-rm-email').value.trim();
+      if (!email) {
+        alert('Please enter your official relationship manager email.');
+        return;
+      }
+
+      const res = VednovaDB.lookupRmAccount(email);
+      const resultBox = document.getElementById('rm-admin-contact-result');
+
+      if (!res.found) {
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = `
+          <div class="text-rose-400 font-bold">Account Not Found</div>
+          <p class="text-slate-400">No active relationship manager found with email: <strong>${email}</strong>. Please verify spelling or contact your firm administrator.</p>
+        `;
+        return;
+      }
+
+      resultBox.classList.remove('hidden');
+
+      if (res.isAdmin) {
+        resultBox.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-gold-500/10 border border-gold-500/30 text-xs space-y-2">
+            <div class="flex items-center gap-1.5 text-gold-400 font-bold">
+              <span>👑 Firm Principal / Partner Account</span>
+            </div>
+            <p class="text-slate-300 text-[11.5px] leading-relaxed">
+              <strong>${res.member.name}</strong> (${res.member.email}) is registered as a Firm Administrator for <strong>${res.firm.name}</strong> (${res.firm.arn}).
+            </p>
+            <p class="text-slate-400 text-[11px]">
+              You have direct self-service password reset privileges via SMS/Email OTP under the Principal tab.
+            </p>
+            <button type="button" onclick="switchToAdminReset('${res.member.email}')" class="w-full py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow mt-1">
+              <span>Switch to Principal Tab & Send Verification OTP</span>
+              <span>→</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      resultBox.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+          <div>
+            <span class="text-[10px] text-slate-500 uppercase font-mono">Your Account</span>
+            <strong class="text-white block text-sm">${res.member.name}</strong>
+            <span class="text-slate-400 text-[11px]">${res.member.role}</span>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+            ${res.firm.arn}
+          </span>
+        </div>
+
+        <div class="space-y-1">
+          <span class="text-[10px] text-gold-400 uppercase font-mono font-bold block">Your Firm Administrator:</span>
+          <div class="text-slate-200 font-semibold text-sm">${res.admin.name} (${res.admin.role})</div>
+          <div class="text-slate-400 font-mono text-[11px]">Email: <a href="mailto:${res.admin.email}" class="text-gold-400 underline">${res.admin.email}</a></div>
+          <div class="text-slate-400 text-[11px]">Firm: <strong>${res.firm.name}</strong></div>
+        </div>
+
+        <button type="button" onclick="sendRmResetRequest('${res.member.name}', '${res.admin.name}')" class="w-full mt-2 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gold-400 border border-gold-500/30 font-bold text-xs transition flex items-center justify-center gap-1.5">
+          <span>🔔 Send Reset Notification to ${res.admin.name}</span>
+        </button>
+      `;
+    }
+
+    function switchToAdminReset(email) {
+      switchRecoveryTab('admin');
+      document.getElementById('reset-admin-identifier').value = email;
+      sendAdminResetOTP();
+    }
+
+    function sendRmResetRequest(rmName, adminName) {
+      alert(`Password reset notification logged for ${adminName} (Firm Admin)!\n\nYour administrator has been notified to set a new password for ${rmName} in the Team & RM Management dashboard.`);
+      closeForgotPasswordModal();
+    }
+
+    // ==================== ENTERPRISE SSO FLOW (GOOGLE & MICROSOFT) ====================
+    function openSSOModal(provider) {
+      currentSSOProvider = provider;
+      const modal = document.getElementById('sso-account-modal');
+      const title = document.getElementById('sso-modal-title');
+      const sub = document.getElementById('sso-modal-sub');
+      const icon = document.getElementById('sso-modal-icon');
+      const inputLabel = document.getElementById('sso-input-label');
+      const emailInput = document.getElementById('sso-email-input');
+      const errorBox = document.getElementById('sso-error-box');
+      const submitText = document.getElementById('sso-submit-btn-text');
+      const formView = document.getElementById('sso-form-view');
+      const loadingView = document.getElementById('sso-loading-view');
+
+      errorBox.classList.add('hidden');
+      loadingView.classList.add('hidden');
+      formView.classList.remove('hidden');
+
+      const isGoogle = (provider === 'google');
+      title.textContent = isGoogle ? 'Sign in with Google' : 'Sign in with Microsoft';
+      sub.textContent = isGoogle ? 'to continue to Vednova Policy Vault' : 'to continue to Vednova Policy Vault';
+      inputLabel.textContent = isGoogle ? 'Google Workspace Corporate Email' : 'Microsoft 365 / Outlook Corporate Email';
+      emailInput.placeholder = isGoogle ? 'e.g. advisor@yourfirm.in' : 'e.g. advisor@yourfirm.in';
+      submitText.textContent = isGoogle ? 'Continue with Google' : 'Continue with Microsoft';
+
+      // Prefill previously authenticated email on this device if available
+      try {
+        const lastEmail = localStorage.getItem('vednova_last_sso_email');
+        emailInput.value = lastEmail || '';
+      } catch (e) {
+        emailInput.value = '';
+      }
+
+      icon.innerHTML = isGoogle ? `
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+      ` : `
+        <svg class="w-5 h-5" viewBox="0 0 23 23">
+          <path fill="#f35325" d="M1 1h10v10H1z"/>
+          <path fill="#81bc06" d="M12 1h10v10H12z"/>
+          <path fill="#05a6f0" d="M1 12h10v10H1z"/>
+          <path fill="#ffba08" d="M12 12h10v10H12z"/>
+        </svg>
+      `;
+
+      modal.classList.remove('hidden');
+      setTimeout(() => emailInput.focus(), 100);
+    }
+
+    function closeSSOModal() {
+      document.getElementById('sso-account-modal').classList.add('hidden');
+    }
+
+    function submitSSOOAuth() {
+      const email = document.getElementById('sso-email-input').value.trim();
+      const errorBox = document.getElementById('sso-error-box');
+      const errorMsg = document.getElementById('sso-error-message');
+      const signupLink = document.getElementById('sso-signup-link');
+
+      errorBox.classList.add('hidden');
+
+      if (!email) {
+        errorMsg.textContent = 'Please enter your corporate Google or Microsoft email address.';
+        signupLink.parentElement.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      if (!email.includes('@') || !email.includes('.')) {
+        errorMsg.textContent = 'Please enter a valid email address (e.g. advisor@yourfirm.in).';
+        signupLink.parentElement.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      // Strict tenant authentication check (isRegistration = false)
+      const res = VednovaDB.loginWithSSO(currentSSOProvider, email, null, null, null, false);
+
+      if (!res.success) {
+        // Not registered! Show private, isolated error without revealing any other distributor data
+        errorMsg.innerHTML = `No authorized distributor firm or advisor account found for <strong class="text-white">${email}</strong>.<br><br>Vednova is a private platform for AMFI-registered MFDs and authorized advisors.`;
+        signupLink.href = `mfd-signup.html?email=${encodeURIComponent(email)}&provider=${encodeURIComponent(currentSSOProvider)}`;
+        signupLink.parentElement.classList.remove('hidden');
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      // Successful login -> Show loading state and route to respective dashboard
+      const formView = document.getElementById('sso-form-view');
+      const loadingView = document.getElementById('sso-loading-view');
+      const loadingText = document.getElementById('sso-loading-text');
+
+      formView.classList.add('hidden');
+      loadingView.classList.remove('hidden');
+      loadingText.textContent = `Signing in as ${res.firm.adminName || 'Distributor'} (${res.isRM ? 'Relationship Manager' : 'Principal Admin'})...`;
+
+      try {
+        localStorage.setItem('vednova_last_sso_email', email);
+      } catch (e) {}
+
+      setTimeout(() => {
+        window.location.href = 'mfd-admin.html';
+      }, 400);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vednova MFD Admin Portal — Zenith Wealth Advisors Pvt. Ltd. (ARN-48291)</title>
+  <meta name="description" content="Institutional policy audit and team management platform for Mutual Fund Distributors.">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- PDF.js for rendering uploaded PDF logos to image -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 900: '#070f1a', 950: '#04080f' },
+            navy: { 700: '#152438', 800: '#0d1827', 900: '#08111d', 950: '#050c16' },
+            panel: { 800: '#0f1f33', 900: '#0a1524' },
+            gold: {
+              300: '#f7dfa8',
+              400: '#eed08f',
+              500: '#e1bc70',
+              600: '#c59d4f',
+              700: '#9d7832'
+            }
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #04080f;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(ellipse at 10% 10%, rgba(21, 36, 56, 0.5), transparent 45%),
+        radial-gradient(ellipse at 90% 90%, rgba(225, 188, 112, 0.04), transparent 40%);
+      background-attachment: fixed;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #050c16;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-slate-200 selection:bg-gold-500 selection:text-ink-950">
+
+  <!-- TOP MFD PORTAL HEADER -->
+  <header class="sticky top-0 z-40 bg-navy-950/95 backdrop-blur-md border-b border-slate-800/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Crest & Firm Identity -->
+      <div class="flex items-center gap-4">
+        <div id="mfd-logo-container" class="flex items-center gap-3 border-r border-slate-800 pr-4">
+          <div class="h-9 px-3 rounded-lg bg-navy-900 border border-gold-500/40 flex items-center justify-center gap-1.5 text-gold-300 font-serif font-bold text-xs tracking-wider shadow">
+            <span>🏛️</span>
+            <span>MFD</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <img src="assets/brand-logo.svg" alt="Vednova Logo" class="h-9 w-auto">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-serif text-lg tracking-[0.16em] font-bold text-white">VEDNOVA</span>
+              <span id="portal-role-badge" class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-gold-500/15 text-gold-400 border border-gold-500/30">
+                MFD ADMIN PORTAL
+              </span>
+            </div>
+            <p class="text-[9.5px] text-slate-400 font-mono tracking-wider" id="header-firm-subtext">
+              DISTRIBUTOR PARTNER PORTAL
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-3">
+        <button onclick="openNewClientModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gold-500 hover:bg-gold-400 text-ink-950 font-semibold text-xs transition shadow-lg shadow-gold-500/10">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Register New Client</span>
+        </button>
+
+        <button id="header-add-team-btn" onclick="openAddTeamMemberModal()" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-navy-900 hover:bg-navy-800 border border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition">
+          <svg class="w-3.5 h-3.5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          <span>+ Add Partner / RM</span>
+        </button>
+
+        <!-- Admin Profile Pill & Logout -->
+        <div class="flex items-center gap-2.5 pl-3 border-l border-slate-800">
+          <div id="admin-avatar-initials" class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 flex items-center justify-center text-ink-950 font-bold text-xs font-serif shadow">
+            RD
+          </div>
+          <div class="hidden md:block text-left">
+            <span id="admin-profile-name" class="text-xs font-semibold text-white block">Rohit Dev</span>
+            <span id="admin-profile-role" class="text-[10px] text-slate-400 font-mono block">Principal MFD (Admin)</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button onclick="handleMfdLogout()" title="Log out / Switch Account" class="ml-1 p-2 rounded-lg bg-navy-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700 transition flex items-center gap-1 text-[11px]">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span class="hidden lg:inline font-mono">Logout</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN ADMIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- OVERVIEW STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="bg-panel-800/80 border border-slate-800 p-4 rounded-xl">
+        <span class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Total Clients Audited</span>
+        <div id="stat-total-clients" class="text-2xl font-serif text-white font-bold mt-1">24 Families</div>
+        <span id="stat-clients-sub" class="text-[10px] text-emerald-400 font-medium mt-1 block">Across all active RMs</span>
+      </div>
+
+      <div class="bg-panel-800/80 border border-slate-800 p-4 rounded-xl">
+        <span class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Policies Monitored</span>
+        <div id="stat-total-policies" class="text-2xl font-serif text-white font-bold mt-1">0 Policies</div>
+        <span id="stat-policies-sub" class="text-[10px] text-slate-400 mt-1 block">No policies uploaded yet</span>
+      </div>
+
+      <div class="bg-panel-800/80 border border-slate-800 p-4 rounded-xl">
+        <span class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Annual Premium Volume</span>
+        <div id="stat-total-premium" class="text-2xl font-serif text-gold-300 font-bold mt-1">₹0/yr</div>
+        <span id="stat-premium-sub" class="text-[10px] text-slate-400 mt-1 block">Awaiting client policy entry</span>
+      </div>
+
+      <div class="bg-panel-800/80 border border-emerald-500/30 p-4 rounded-xl">
+        <span class="text-[10px] uppercase font-mono tracking-wider text-emerald-400 block">SIP Pipeline Unlocked</span>
+        <div id="stat-sip-pipeline" class="text-2xl font-serif text-emerald-400 font-bold mt-1">₹0/yr</div>
+        <span id="stat-sip-pipeline-sub" class="text-[10px] text-emerald-300 font-medium mt-1 block">₹0/mo redirected to SIPs</span>
+      </div>
+
+      <div class="bg-panel-800/80 border border-slate-800 p-4 rounded-xl col-span-2 lg:col-span-1">
+        <span id="stat-card-5-title" class="text-[10px] uppercase font-mono tracking-wider text-slate-500 block">Firm Team Members</span>
+        <div id="stat-total-rms" class="text-2xl font-serif text-white font-bold mt-1">4 Active RMs</div>
+        <span id="stat-card-5-sub" class="text-[10px] text-slate-400 mt-1 block">Assigned & servicing</span>
+      </div>
+    </div>
+
+    <!-- ADMIN TABS NAVIGATION -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center gap-2">
+        <button id="adm-tab-clients" onclick="switchAdminTab('clients')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-gold-500 text-ink-950 transition shadow">
+          All Client Plans (Firm-wide)
+        </button>
+        <button id="adm-tab-team" onclick="switchAdminTab('team')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition">
+          Team & RM Management
+        </button>
+        <button id="adm-tab-firm" onclick="switchAdminTab('firm')" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition">
+          Firm Settings & Co-Branding
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-400">Firm:</span>
+        <strong id="admin-current-firm-label" class="text-white font-semibold">Distributor Partner Firm</strong>
+      </div>
+    </div>
+
+    <!-- SECTION 1: ALL CLIENT PLANS (FIRM-WIDE VIEW) -->
+    <section id="adm-panel-clients" class="space-y-4">
+      
+      <!-- Table Filter Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-panel-800/60 border border-slate-800 p-3.5 rounded-xl">
+        <div class="flex items-center gap-2 flex-1 max-w-md">
+          <svg class="w-4 h-4 text-slate-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input id="client-search-input" type="text" placeholder="Search by client name, case ID, or policy..." class="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none" oninput="filterClientsTable()">
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select id="branch-filter-select" class="bg-navy-950 border border-slate-700 text-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none" onchange="filterClientsTable()">
+            <option value="ALL">All Segments & Benchmarks</option>
+            <option value="ARMY">⚔️ Indian Army (DSOPF 7.10%)</option>
+            <option value="NAVY">⚓ Indian Navy (DSOPF 7.10%)</option>
+            <option value="AIR_FORCE">✈️ Indian Air Force (DSOPF 7.10%)</option>
+            <option value="PARAMILITARY">🛡️ Govt / Paramilitary (GPF 7.10%)</option>
+            <option value="CIVILIAN_SALARIED">💼 Corporate Salaried (EPF 8.25%)</option>
+            <option value="CIVILIAN">👔 Civilian / Entrepreneur (PPF & SGB)</option>
+          </select>
+
+          <select id="rm-filter-select" class="bg-navy-950 border border-slate-700 text-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none" onchange="filterClientsTable()">
+            <option value="ALL">All Servicing RMs</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clients Plans Table -->
+      <div class="bg-panel-800/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="text-[10px] text-slate-400 uppercase bg-navy-950/90 border-b border-slate-800 font-mono tracking-wider">
+              <tr>
+                <th class="py-3.5 px-4">Case ID & Client Name</th>
+                <th class="py-3.5 px-4">Service Branch / Status</th>
+                <th class="py-3.5 px-4">Assigned RM</th>
+                <th class="py-3.5 px-4">Policies</th>
+                <th class="py-3.5 px-4">Annual Premium</th>
+                <th class="py-3.5 px-4">Fiduciary Direction</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clients-table-tbody" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered dynamically by js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: TEAM & RM MANAGEMENT -->
+    <section id="adm-panel-team" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-panel-800/80 border border-slate-800 p-6 rounded-2xl">
+        <div>
+          <h2 class="text-xl font-serif text-white font-medium">Partners, Wealth Advisors & Relationship Managers</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Manage your firm's partners, senior advisors, and servicing RMs. Appoint business partners as Co-Admins with full administrative rights.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btn-open-add-team-modal" onclick="openAddTeamMemberModal()" class="px-4 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs transition shadow flex items-center gap-1.5">
+            <span>+ Add Partner / Team Member</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin & Partner Access Privileges Banner -->
+      <div id="admin-privileges-banner" class="p-4 rounded-xl bg-panel-800/60 border border-slate-800 flex items-start gap-3 text-xs text-slate-400">
+        <span class="text-gold-400 text-base leading-none mt-0.5">👑</span>
+        <div>
+          <strong class="text-slate-200">Multiple Business Partners & Co-Admins:</strong>
+          <span>
+            You can appoint co-founders or business partners as <strong>Admin Partners</strong> using the "+ Add Partner" button or the 1-click "Make Admin Partner" option on any team card. Admin Partners enjoy full firm-wide access to audit vaults, manage servicing RMs, and export white-labeled dossiers.
+          </span>
+        </div>
+      </div>
+
+      <!-- Team Members Grid -->
+      <div id="team-members-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Rendered dynamically by js/admin.js -->
+      </div>
+    </section>
+
+    <!-- SECTION 3: FIRM SETTINGS & CO-BRANDING -->
+    <section id="adm-panel-firm" class="hidden space-y-6">
+      <div class="bg-panel-800/80 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-3xl">
+        <h2 class="text-xl font-serif text-white font-medium mb-1">Firm Identity & White-Label Settings</h2>
+        <p class="text-xs text-slate-400 mb-6">
+          These details are embedded in all client vault links, cover pages, and generated PDF audit dossiers.
+        </p>
+
+        <!-- RM Read-Only Notice (Hidden for Admins, shown for RMs) -->
+        <div id="rm-settings-notice" class="hidden mb-6 p-4 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs text-sky-200 flex items-center gap-3">
+          <span class="text-lg">🛡️</span>
+          <div>
+            <strong>Viewing Firm White-Label Configuration (Read-Only):</strong>
+            <span> You are signed in as a Servicing Relationship Manager. Legal AMFI registration, brand emblems, and firm credentials can only be edited by Principal Admins and Partners.</span>
+          </div>
+        </div>
+
+        <!-- BRAND LOGO MANAGEMENT SECTION -->
+        <div class="mb-6 p-5 rounded-xl bg-navy-950/80 border border-slate-800 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-serif font-bold text-white flex items-center gap-2">
+                <span>Distributor Logo & Brand Emblem</span>
+                <span class="text-[9px] font-mono uppercase px-2 py-0.5 rounded bg-gold-500/20 text-gold-400 border border-gold-500/30">White-Label</span>
+              </h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">
+                Embedded in the portal header, client vaults, and printed on cover pages & footers of generated PDF audit dossiers.
+              </p>
+            </div>
+            <button id="btn-ai-logo-open" type="button" onclick="openAILogoModal()" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-500 hover:to-gold-300 text-ink-950 font-bold text-xs transition shadow-lg shadow-gold-500/10 flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <span>⚡ Generate with AI Agent</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center pt-1">
+            <!-- Current Logo Preview Box (4 Cols) -->
+            <div class="md:col-span-4 p-4 rounded-xl bg-panel-900 border border-slate-800 flex flex-col items-center justify-center text-center">
+              <span class="text-[10px] font-mono uppercase text-slate-500 mb-2">Active Logo</span>
+              <div id="firm-logo-preview-box" class="h-20 w-full rounded-lg bg-navy-950 border border-slate-800/80 flex items-center justify-center p-2 overflow-hidden">
+                <!-- Preview image or crest rendered dynamically -->
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <button type="button" onclick="resetFirmLogo()" class="text-[10px] text-slate-400 hover:text-rose-400 transition underline">
+                  Reset to Default
+                </button>
+              </div>
+            </div>
+
+            <!-- Upload Dropzone (8 Cols) -->
+            <div class="md:col-span-8">
+              <div id="logo-dropzone" onclick="document.getElementById('firm-logo-file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-gold-500/80 rounded-xl p-4 text-center cursor-pointer transition group bg-panel-900/40 hover:bg-panel-900/80">
+                <input id="firm-logo-file-input" type="file" accept=".png,.jpg,.jpeg,.svg,.pdf" class="hidden" onchange="handleLogoFileUpload(event)">
+                <div class="flex flex-col items-center justify-center space-y-1">
+                  <div class="w-8 h-8 rounded-full bg-navy-900 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:text-gold-400 group-hover:border-gold-500/50 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                  </div>
+                  <div class="text-xs font-medium text-slate-200 group-hover:text-white">
+                    <span class="text-gold-400 font-semibold">Click to upload</span> or drag and drop logo
+                  </div>
+                  <p class="text-[10px] text-slate-500 font-mono">
+                    Supported: PDF, PNG, JPG, JPEG, SVG (Max 5MB)
+                  </p>
+                </div>
+              </div>
+              <div id="upload-status-indicator" class="hidden mt-2 text-[10px] text-emerald-400 font-mono"></div>
+            </div>
+          </div>
+        </div>
+
+        <form id="firm-settings-form" onsubmit="saveFirmSettings(event)" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-slate-400 uppercase font-mono text-[10px] mb-1">Distributor Firm Name</label>
+              <input id="setting-firm-name" type="text" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-medium focus:border-gold-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-mono text-[10px] mb-1">Year Established</label>
+              <input id="setting-firm-year" type="number" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-medium focus:border-gold-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-slate-400 uppercase font-mono text-[10px] mb-1">AMFI Registration Number (ARN)</label>
+              <input id="setting-firm-arn" type="text" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-medium focus:border-gold-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-mono text-[10px] mb-1">Admin Email Address</label>
+              <input id="setting-firm-email" type="email" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-medium focus:border-gold-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 uppercase font-mono text-[10px] mb-1">Firm Tagline / Heritage Notice</label>
+            <input id="setting-firm-tagline" type="text" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-medium focus:border-gold-500 focus:outline-none">
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 flex justify-end">
+            <button id="btn-save-firm-settings" type="submit" class="px-5 py-2.5 rounded-lg bg-gold-500 text-ink-950 font-bold hover:bg-gold-400 transition">
+              Save Firm Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: REGISTER NEW CLIENT (WHERE DEFENCE BRANCH IS CHOSEN) -->
+  <div id="new-client-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-base font-serif font-bold text-white">Register New Client Audit</h3>
+          <p class="text-[11px] text-slate-400">Creates a new family policy vault under your firm.</p>
+        </div>
+        <button onclick="closeNewClientModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <form onsubmit="handleCreateClient(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Client Full Name</label>
+          <input id="new-client-name" type="text" placeholder="e.g. Col. Arvind Rathore, Brig. Rawat, Capt. A. Verma" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+        </div>
+
+        <!-- DEFENCE SERVICE BRANCH DROPDOWN (REGISTER STEP) -->
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">
+            Defence Service Branch / Occupation
+          </label>
+          <select id="new-client-branch" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+            <option value="ARMY">⚔️ Indian Army (DSOPF 7.10% & Field Duty Rules)</option>
+            <option value="NAVY">⚓ Indian Navy (DSOPF 7.10% & Naval/Sea Duty Rules)</option>
+            <option value="AIR_FORCE">✈️ Indian Air Force (DSOPF 7.10% & Flight/Aviation Rules)</option>
+            <option value="PARAMILITARY">🛡️ Govt / Paramilitary (GPF 7.10% & Central Service Rules)</option>
+            <option value="CIVILIAN_SALARIED">💼 Corporate Salaried Professional (EPF 8.25% Sovereign Rate)</option>
+            <option value="CIVILIAN">👔 Civilian / Entrepreneur / Family Office (PPF 7.10% & SGB)</option>
+          </select>
+          <span class="text-[10px] text-slate-500 mt-1 block">
+            This configures operational exclusion audits and sovereign provident fund benchmarks automatically.
+          </span>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Assigned Servicing RM</label>
+          <select id="new-client-rm" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+          </select>
+        </div>
+
+        <div class="pt-4 flex justify-end gap-2 border-t border-slate-800">
+          <button type="button" onclick="closeNewClientModal()" class="px-4 py-2 rounded-lg bg-navy-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-gold-500 text-ink-950 font-bold hover:bg-gold-400 transition">Create & Open Vault</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD PARTNER OR TEAM MEMBER -->
+  <div id="add-team-member-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-base font-serif font-bold text-white">Add Partner / Team Member</h3>
+          <p class="text-[11px] text-slate-400">Add co-founders, business partners, or servicing relationship managers to your firm.</p>
+        </div>
+        <button onclick="closeAddTeamMemberModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <form onsubmit="handleAddTeamMember(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Full Name</label>
+          <input id="new-member-name" type="text" placeholder="e.g. Suresh Verma, Aditi Roy" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Official Email</label>
+            <input id="new-member-email" type="email" placeholder="name@yourfirm.com" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Phone Number</label>
+            <input id="new-member-phone" type="tel" placeholder="+91 98XXX XXXXX" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Designation / Title</label>
+          <input id="new-member-role" type="text" placeholder="e.g. Managing Partner & Co-Founder, Senior Wealth RM" required class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Role & Access Privileges</label>
+          <select id="new-member-access-level" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white focus:border-gold-500 focus:outline-none">
+            <option value="ADMIN">👑 Full Administrator & Business Partner (Can manage all clients, team & settings)</option>
+            <option value="RM" selected>Standard Member (Relationship Manager / Financial Planner)</option>
+          </select>
+          <span class="text-[10px] text-slate-500 mt-1 block">
+            Admin Partners have administrative privileges to manage all firm clients, team members, and firm profile settings.
+          </span>
+        </div>
+
+        <div class="pt-4 flex justify-end gap-2 border-t border-slate-800">
+          <button type="button" onclick="closeAddTeamMemberModal()" class="px-4 py-2 rounded-lg bg-navy-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-gold-500 text-ink-950 font-bold hover:bg-gold-400 transition">Add to Firm Roster</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CHANGE RM PASSWORD / PIN -->
+  <div id="change-rm-password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-base font-serif font-bold text-white flex items-center gap-2">
+            <span>🔑 Change Team Member Password</span>
+          </h3>
+          <p class="text-[11px] text-slate-400">Set or reset portal credentials for this relationship manager.</p>
+        </div>
+        <button onclick="closeChangeRmPasswordModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveRmPassword(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="change-rm-id">
+
+        <div class="p-3 rounded-lg bg-navy-950 border border-slate-800 space-y-1">
+          <div class="text-[10px] text-slate-500 uppercase font-mono">Team Member</div>
+          <strong id="change-rm-name" class="text-white text-sm block">Rahul Sharma</strong>
+          <span id="change-rm-meta" class="text-slate-400 text-[11px] font-mono">rahul.s@zenithwealth.in · Senior Wealth RM</span>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-slate-400 font-mono uppercase text-[10px]">New Password / Security PIN</label>
+            <button type="button" onclick="generateRandomRMPassword()" class="text-[10px] text-gold-400 hover:text-gold-300 font-mono underline">
+              ⚡ Generate Secure PIN
+            </button>
+          </div>
+          <input id="change-rm-new-password" type="text" required placeholder="Enter new password (e.g. Pass2026!)" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-gold-500 focus:outline-none">
+          <span class="text-[10.5px] text-slate-500 mt-1 block">
+            The relationship manager will use their official email and this password to sign in.
+          </span>
+        </div>
+
+        <div class="pt-4 flex justify-end gap-2 border-t border-slate-800">
+          <button type="button" onclick="closeChangeRmPasswordModal()" class="px-4 py-2 rounded-lg bg-navy-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-gold-500 text-ink-950 font-bold hover:bg-gold-400 transition">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: AI LOGO GENERATOR (VEDNOVA AI BRAND ARCHITECT) -->
+  <div id="ai-logo-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-panel-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 my-8 relative">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 to-amber-400 flex items-center justify-center text-ink-950 font-bold text-lg shadow-lg shadow-gold-500/20">
+            ⚡
+          </div>
+          <div>
+            <h3 class="text-base font-serif font-bold text-white flex items-center gap-2">
+              <span>Vednova AI Brand Architect</span>
+              <span class="text-[9px] font-mono uppercase px-2 py-0.5 rounded bg-gold-500/20 text-gold-400 border border-gold-500/30">Vector Engine</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Synthesize bespoke, vector-sharp branding emblems tailored to your firm's name and heritage.</p>
+          </div>
+        </div>
+        <button onclick="closeAILogoModal()" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <!-- Style Persona Cards (4 Grid) -->
+      <div>
+        <label class="block text-slate-400 mb-1.5 font-mono uppercase text-[10px] tracking-wider">Select Insignia Archetype</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="ai-archetype-container">
+          <button type="button" onclick="selectAIArchetype('heritage')" id="ai-arch-heritage" class="p-3 rounded-xl border-2 border-gold-500 bg-navy-950 text-left transition relative group shadow-sm">
+            <div class="text-xl mb-1">🏛️</div>
+            <div class="text-xs font-bold text-white">Heritage Crest</div>
+            <div class="text-[10px] text-slate-400 leading-tight mt-0.5">Roman laurel wreath & classic serif</div>
+          </button>
+
+          <button type="button" onclick="selectAIArchetype('sovereign')" id="ai-arch-sovereign" class="p-3 rounded-xl border border-slate-700 bg-navy-950 hover:border-slate-500 text-left transition relative group">
+            <div class="text-xl mb-1">🛡️</div>
+            <div class="text-xs font-bold text-white">Sovereign Shield</div>
+            <div class="text-[10px] text-slate-400 leading-tight mt-0.5">Heraldic trust shield & stars</div>
+          </button>
+
+          <button type="button" onclick="selectAIArchetype('modern')" id="ai-arch-modern" class="p-3 rounded-xl border border-slate-700 bg-navy-950 hover:border-slate-500 text-left transition relative group">
+            <div class="text-xl mb-1">📐</div>
+            <div class="text-xs font-bold text-white">Modern Monogram</div>
+            <div class="text-[10px] text-slate-400 leading-tight mt-0.5">Geometric fintech polygon mark</div>
+          </button>
+
+          <button type="button" onclick="selectAIArchetype('defence')" id="ai-arch-defence" class="p-3 rounded-xl border border-slate-700 bg-navy-950 hover:border-slate-500 text-left transition relative group">
+            <div class="text-xl mb-1">⚔️</div>
+            <div class="text-xs font-bold text-white">Defence Desk</div>
+            <div class="text-[10px] text-slate-400 leading-tight mt-0.5">Triservice swords & military stars</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Customization Inputs -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Brand Name</label>
+          <input id="ai-input-name" type="text" placeholder="e.g. Apex Wealth Partners" oninput="triggerAIGeneration(false)" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2 text-white focus:border-gold-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Year Established</label>
+          <input id="ai-input-year" type="number" placeholder="2014" oninput="triggerAIGeneration(false)" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2 text-white focus:border-gold-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Color Palette</label>
+          <select id="ai-input-palette" onchange="triggerAIGeneration(false)" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2 text-white focus:border-gold-500 focus:outline-none">
+            <option value="gold_navy">Imperial Gold & Midnight Navy</option>
+            <option value="sapphire">Royal Sapphire & Platinum</option>
+            <option value="emerald">Emerald Fiduciary & Gold</option>
+            <option value="ruby_bronze">Ruby Sovereign & Warm Bronze</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-slate-400 mb-1 font-mono uppercase text-[10px]">Subtext / Tagline</label>
+        <input id="ai-input-tagline" type="text" placeholder="e.g. WEALTH MANAGEMENT · FIDUCIARY ADVISORY" oninput="triggerAIGeneration(false)" class="w-full bg-navy-950 border border-slate-700 rounded-lg p-2 text-xs text-white focus:border-gold-500 focus:outline-none">
+      </div>
+
+      <!-- Generator Preview Stage -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400 font-mono uppercase text-[10px] tracking-wider">Live AI Vector Synthesis Preview</span>
+          <div class="flex items-center gap-1.5 bg-navy-950 p-0.5 rounded-lg border border-slate-800">
+            <button type="button" onclick="toggleAIPreviewBg('dark')" id="ai-bg-dark-btn" class="px-2.5 py-1 text-[10px] font-mono rounded bg-slate-800 text-gold-400 font-bold">Dark Header</button>
+            <button type="button" onclick="toggleAIPreviewBg('light')" id="ai-bg-light-btn" class="px-2.5 py-1 text-[10px] font-mono rounded text-slate-400 hover:text-white">Light PDF</button>
+          </div>
+        </div>
+
+        <div id="ai-preview-stage" class="h-32 w-full rounded-xl bg-navy-950 border border-slate-800 flex items-center justify-center p-4 transition-colors relative overflow-hidden">
+          <div id="ai-preview-content" class="w-full flex items-center justify-center">
+            <!-- Dynamic SVG emblem rendered here -->
+          </div>
+          <!-- Loading Overlay -->
+          <div id="ai-loading-overlay" class="absolute inset-0 bg-navy-950/90 backdrop-blur-sm hidden flex flex-col items-center justify-center gap-2">
+            <div class="w-7 h-7 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-xs font-mono text-gold-400">Synthesizing vector paths...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800">
+        <button type="button" onclick="triggerAIGeneration(true)" class="px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white text-xs font-medium flex items-center gap-1.5 transition">
+          <span>🎲 Generate Variation</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="downloadAILogoSVG()" class="px-3.5 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs transition">
+            Export SVG
+          </button>
+          <button type="button" onclick="closeAILogoModal()" class="px-4 py-2 rounded-lg bg-navy-800 text-slate-300 hover:text-white text-xs">
+            Cancel
+          </button>
+          <button type="button" onclick="applyAIGeneratedLogo()" class="px-5 py-2 rounded-lg bg-gold-500 hover:bg-gold-400 text-ink-950 font-bold text-xs shadow-lg shadow-gold-500/20 transition flex items-center gap-1.5">
+            <span>✓ Apply to Firm Profile</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/mock-db.js"></script>
+  <script src="js/math-engine.js"></script>
+  <script src="js/sop-rules.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

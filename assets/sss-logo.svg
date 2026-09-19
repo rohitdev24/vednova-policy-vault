@@ -1,0 +1,27 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff4cf"/>
+      <stop offset="50%" stop-color="#e1bc70"/>
+      <stop offset="100%" stop-color="#b88937"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Crest Emblem -->
+  <g transform="translate(10, 10)">
+    <!-- Hexagonal Crest Outline -->
+    <polygon points="50,5 92,28 92,72 50,95 8,72 8,28" fill="#091525" stroke="url(#goldGrad)" stroke-width="2.5"/>
+    <polygon points="50,11 86,31 86,69 50,89 14,69 14,31" fill="none" stroke="rgba(225, 188, 112, 0.4)" stroke-width="1"/>
+    
+    <!-- Monogram SSS -->
+    <text x="50" y="58" font-family="'Cinzel', 'Georgia', serif" font-size="28" font-weight="700" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="2">SSS</text>
+    <text x="50" y="78" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="3">ESTD 1998</text>
+  </g>
+
+  <!-- Firm Name Typography -->
+  <g transform="translate(125, 26)">
+    <text x="0" y="28" font-family="'Cinzel', 'Georgia', serif" font-size="20" font-weight="700" fill="#ffffff" letter-spacing="1.5">SSS DISTRIBUTORS</text>
+    <text x="0" y="48" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="600" fill="#e1bc70" letter-spacing="4">PRIVATE LIMITED</text>
+    <text x="0" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="500" fill="#94a3b8" letter-spacing="1">MUTUAL FUND DISTRIBUTOR · SINCE 1998</text>
+  </g>
+</svg>
